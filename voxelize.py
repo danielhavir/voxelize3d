@@ -8,8 +8,7 @@ def voxelize(
         voxel_size: np.ndarray,
         grid_range: np.ndarray,
         max_points_in_voxel: int,
-        max_num_voxels: int,
-        include_relative_position: bool = False
+        max_num_voxels: int
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Converts 3D point cloud to a sparse voxel grid
@@ -26,12 +25,11 @@ def voxelize(
         num_points_per_voxel (num_voxels,)
     )
     """
-    points_copy = points[:, :3].copy()
+    points_copy = points.copy()
     grid_size = np.floor((grid_range[3:] - grid_range[:3]) / voxel_size).astype(np.int32)
 
     coor_to_voxelidx = np.full((grid_size[2], grid_size[1], grid_size[0]), -1, dtype=np.int32)
-    num_features = points.shape[1] if not include_relative_position else points.shape[1] + 3
-    voxels = np.zeros((max_num_voxels, max_points_in_voxel, num_features), dtype=points_copy.dtype)
+    voxels = np.zeros((max_num_voxels, max_points_in_voxel, points.shape[-1]), dtype=points_copy.dtype)
     coordinates = np.zeros((max_num_voxels, 3), dtype=np.int32)
     num_points_per_voxel = np.zeros(max_num_voxels, dtype=np.int32)
 
