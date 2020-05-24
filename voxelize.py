@@ -35,7 +35,7 @@ def voxelize(
     coordinates = np.zeros((max_num_voxels, 3), dtype=np.int32)
     num_points_per_voxel = np.zeros(max_num_voxels, dtype=np.int32)
 
-    points_coords = np.floor((points_copy - grid_range[:3]) / voxel_size).astype(np.int32)
+    points_coords = np.floor((points_copy[:, :3] - grid_range[:3]) / voxel_size).astype(np.int32)
     mask = ((points_coords >= 0) & (points_coords < grid_size)).all(1)
     points_coords = points_coords[mask, ::-1]
     points_copy = points_copy[mask]

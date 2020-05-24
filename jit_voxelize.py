@@ -25,21 +25,21 @@ def voxelize_jit(
         num_points_per_voxel (num_voxels,)
     )
     """
-    points = points.copy()
+    points_copy = points.copy()
     grid_size = np.floor((grid_range[3:] - grid_range[:3]) / voxel_size).astype(np.int32)
 
     coor_to_voxelidx = np.full((grid_size[2], grid_size[1], grid_size[0]), -1, dtype=np.int32)
-    voxels = np.zeros((max_num_voxels, max_points_in_voxel, points.shape[-1]), dtype=points.dtype)
+    voxels = np.zeros((max_num_voxels, max_points_in_voxel, points_copy.shape[-1]), dtype=points_copy.dtype)
     coors = np.zeros((max_num_voxels, 3), dtype=np.int32)
     num_points_per_voxel = np.zeros(shape=(max_num_voxels,), dtype=np.int32)
 
-    coor = np.floor((points - grid_range[:3]) / voxel_size).astype(np.int32)
+    coor = np.floor((points_copy[:, :3] - grid_range[:3]) / voxel_size).astype(np.int32)
     mask = np.logical_and(np.logical_and((coor[:, 0] >= 0) & (coor[:, 0] < grid_size[0]),
                                          (coor[:, 1] >= 0) & (coor[:, 1] < grid_size[1])),
                           (coor[:, 2] >= 0) & (coor[:, 2] < grid_size[2]))
     coor = coor[mask, ::-1]
-    points = points[mask]
-    assert points.shape[0] == coor.shape[0]
+    points_copy = points_copy[mask]
+    assert points_copy.shape[0] == coor.shape[0]
 
     voxel_num = 0
     for i, c in enumerate(coor):
@@ -53,7 +53,7 @@ def voxelize_jit(
             coors[voxel_id] = c
         n_pts = num_points_per_voxel[voxel_id]
         if n_pts < max_points_in_voxel:
-            voxels[voxel_id, n_pts] = points[i]
+            voxels[voxel_id, n_pts] = points_copy[i]
             num_points_per_voxel[voxel_id] += 1
 
     return voxels[:voxel_num], coors[:voxel_num], num_points_per_voxel[:voxel_num]
