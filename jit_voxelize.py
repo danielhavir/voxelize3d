@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import numpy as np
 from numba import njit
 
@@ -11,7 +9,7 @@ def voxelize_jit(
         grid_range: np.ndarray,
         max_points_in_voxel: int = 60,
         max_num_voxels: int = 20000
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Numba-friendly version of voxelize
     :param points: (num_points, num_features), first 3 elements must be <x>, <y>, <z>
@@ -46,9 +44,9 @@ def voxelize_jit(
         voxel_id = coor_to_voxelidx[c[0], c[1], c[2]]
         if voxel_id == -1:
             voxel_id = voxel_num
-            if voxel_num > max_num_voxels:
-                continue
             voxel_num += 1
+            if voxel_num > max_num_voxels:
+                break
             coor_to_voxelidx[c[0], c[1], c[2]] = voxel_id
             coors[voxel_id] = c
         n_pts = num_points_per_voxel[voxel_id]

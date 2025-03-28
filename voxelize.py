@@ -1,5 +1,3 @@
-from typing import Tuple
-
 import numpy as np
 
 
@@ -9,7 +7,7 @@ def voxelize(
         grid_range: np.ndarray,
         max_points_in_voxel: int,
         max_num_voxels: int
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Converts 3D point cloud to a sparse voxel grid
     :param points: (num_points, num_features), first 3 elements must be <x>, <y>, <z>
@@ -44,9 +42,9 @@ def voxelize(
         voxel_idx = coor_to_voxelidx[tuple(coord)]
         if voxel_idx == -1:
             voxel_idx = voxel_num
-            if voxel_num > max_num_voxels:
-                continue
             voxel_num += 1
+            if voxel_num > max_num_voxels:
+                break
             coor_to_voxelidx[tuple(coord)] = voxel_idx
             coordinates[voxel_idx] = coord
         point_idx = num_points_per_voxel[voxel_idx]
